@@ -4,6 +4,7 @@ ptree - a simple directory tree viewer
 
 import os
 import pathlib
+import sys
 
 PIPE = "|"
 ELBOW = "└──"
@@ -13,14 +14,24 @@ SPACE_PREFIX = "    "
 
 
 class DirectoryTree:
-    def __init__(self, root: pathlib.Path, dir_only: bool = False) -> None:
+    def __init__(
+        self, root: pathlib.Path, dir_only: bool = False, output=sys.stdout
+    ) -> None:
+        self._output = output
         self._generator = _TreeGenerator(root, dir_only)
 
     def generate(self):
         tree = self._generator.build()
 
-        for entry in tree:
-            print(entry)
+        if self._output != sys.stdout:
+            tree.insert(0, "```")
+            tree.append("```")
+
+            self._output = open(self._output, mode="w", encoding="utf-8")
+
+        with self._output as stream:
+            for entry in tree:
+                print(entry, file=stream)
 
 
 class _TreeGenerator:
