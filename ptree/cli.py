@@ -18,7 +18,7 @@ def main() -> None:
         print(f"Error: {root} is not a directory.")
         sys.exit(1)
 
-    tree = DirectoryTree(root, args.dir_only, args.output)
+    tree = DirectoryTree(root, args.dir_only, args.emojis, args.output)
     tree.generate()
 
 
@@ -51,6 +51,12 @@ def parse_cmd_line_arguments() -> argparse.Namespace:
         nargs="?",
         default=sys.stdout,
         help="output file (default: stdout)",
+    )
+    parser.add_argument(
+        "-e",
+        "--emojis",
+        action="store_true",
+        help="show emojis in the tree",
     )
 
     return parser.parse_args()

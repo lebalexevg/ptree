@@ -12,13 +12,21 @@ TEE = "├──"
 PIPE_PREFIX = "│   "
 SPACE_PREFIX = "    "
 
+OPEN_DIRECTORY_ICON = "📁"
+CLOSED_DIRECTORY_ICON = "📂"
+FILE_ICON = "📄"
+
 
 class DirectoryTree:
     def __init__(
-        self, root: pathlib.Path, dir_only: bool = False, output=sys.stdout
+        self,
+        root: pathlib.Path,
+        dir_only: bool = False,
+        show_emojis: bool = False,
+        output=sys.stdout,
     ) -> None:
         self._output = output
-        self._generator = _TreeGenerator(root, dir_only)
+        self._generator = _TreeGenerator(root, dir_only, show_emojis)
 
     def generate(self):
         tree = self._generator.build()
@@ -35,9 +43,12 @@ class DirectoryTree:
 
 
 class _TreeGenerator:
-    def __init__(self, root: pathlib.Path, dir_only: bool = False) -> None:
+    def __init__(
+        self, root: pathlib.Path, dir_only: bool = False, show_emojis: bool = False
+    ) -> None:
         self._root = root
         self._dir_only = dir_only
+        self._show_emojis = show_emojis
         self._tree = []
 
     def build(self) -> list[str]:
@@ -80,7 +91,16 @@ class _TreeGenerator:
         prefix: str,
         connector: str,
     ) -> None:
-        self._tree.append(f"{prefix}{connector} {directory.name}{os.sep}")
+
+        emoji = (
+            f" {CLOSED_DIRECTORY_ICON if any(directory.iterdir()) else OPEN_DIRECTORY_ICON}"
+            if self._show_emojis
+            else ""
+        )
+
+        print(self._dir_only)
+
+        self._tree.append(f"{prefix}{connector}{emoji} {directory.name}{os.sep}")
 
         if index != entries_count - 1:
             prefix += PIPE_PREFIX
@@ -92,4 +112,6 @@ class _TreeGenerator:
         self._tree.append(prefix.rstrip())
 
     def _add_file(self, file: pathlib.Path, prefix: str, connector: str) -> None:
-        self._tree.append(f"{prefix}{connector} {file.name}")
+        emoji = f" {FILE_ICON}" if self._show_emojis else ""
+
+        self._tree.append(f"{prefix}{connector}{emoji} {file.name}")
