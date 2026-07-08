@@ -16,6 +16,10 @@ OPEN_DIRECTORY_ICON = "📁"
 CLOSED_DIRECTORY_ICON = "📂"
 FILE_ICON = "📄"
 
+DIRECTORY_COLOR_CODE = "\x1b[33m"
+FILE_COLOR_CODE = "\x1b[36m"
+RESET_COLOR_CODE = "\x1b[0m"
+
 
 class DirectoryTree:
     def __init__(
@@ -23,10 +27,11 @@ class DirectoryTree:
         root: pathlib.Path,
         dir_only: bool = False,
         show_emojis: bool = False,
+        use_color: bool = False,
         output=sys.stdout,
     ) -> None:
         self._output = output
-        self._generator = _TreeGenerator(root, dir_only, show_emojis)
+        self._generator = _TreeGenerator(root, dir_only, show_emojis, use_color)
 
     def generate(self):
         tree = self._generator.build()
@@ -44,11 +49,16 @@ class DirectoryTree:
 
 class _TreeGenerator:
     def __init__(
-        self, root: pathlib.Path, dir_only: bool = False, show_emojis: bool = False
+        self,
+        root: pathlib.Path,
+        dir_only: bool = False,
+        show_emojis: bool = False,
+        use_color: bool = False,
     ) -> None:
         self._root = root
         self._dir_only = dir_only
         self._show_emojis = show_emojis
+        self._use_color = use_color
         self._tree = []
 
     def build(self) -> list[str]:
@@ -98,7 +108,9 @@ class _TreeGenerator:
             else ""
         )
 
-        self._tree.append(f"{prefix}{connector}{emoji} {directory.name}{os.sep}")
+        body = f"{DIRECTORY_COLOR_CODE if self._use_color else ''}{emoji} {directory.name}{os.sep}{RESET_COLOR_CODE if self._use_color else ''}"
+
+        self._tree.append(f"{prefix}{connector}{body}")
 
         if index != entries_count - 1:
             prefix += PIPE_PREFIX
@@ -111,5 +123,6 @@ class _TreeGenerator:
 
     def _add_file(self, file: pathlib.Path, prefix: str, connector: str) -> None:
         emoji = f" {FILE_ICON}" if self._show_emojis else ""
+        body = f"{FILE_COLOR_CODE if self._use_color else ''}{emoji} {file.name}{RESET_COLOR_CODE if self._use_color else ''}"
 
-        self._tree.append(f"{prefix}{connector}{emoji} {file.name}")
+        self._tree.append(f"{prefix}{connector}{body}")
