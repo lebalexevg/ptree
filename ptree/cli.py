@@ -18,7 +18,9 @@ def main() -> None:
         print(f"Error: {root} is not a directory.")
         sys.exit(1)
 
-    tree = DirectoryTree(root, args.dir_only, args.emojis, args.color, args.output)
+    tree = DirectoryTree(
+        root, args.dir_only, args.emojis, args.color, args.show_hidden, args.output
+    )
     tree.generate()
 
 
@@ -43,6 +45,12 @@ def parse_cmd_line_arguments() -> argparse.Namespace:
         "--dir-only",
         action="store_true",
         help="only show directories, not files",
+    )
+    parser.add_argument(
+        "-s",
+        "--show-hidden",
+        action="store_true",
+        help="show hidden files and directories",
     )
     parser.add_argument(
         "-o",

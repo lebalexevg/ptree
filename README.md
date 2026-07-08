@@ -18,7 +18,7 @@ A simple directory tree viewer for your terminal.
 ## Usage
 
 ```
-ptree [ROOT] [-d] [-e] [-c] [-o FILE]
+ptree [ROOT] [-d] [-e] [-c] [-s] [-o FILE]
 ```
 
 | Argument | Description |
@@ -27,6 +27,7 @@ ptree [ROOT] [-d] [-e] [-c] [-o FILE]
 | `-d`, `--dir-only` | Show directories only, skip files. |
 | `-e`, `--emojis` | Decorate items with emoji icons. |
 | `-c`, `--color` | Highlight directories in yellow and files in cyan. |
+| `-s`, `--show-hidden` | Include hidden files and directories (those starting with `.`). |
 | `-o`, `--output FILE` | Write the tree to a file instead of stdout. |
 
 ### Examples
@@ -39,6 +40,8 @@ ptree -e                        # show with emoji icons
 ptree -c                        # show with colored output
 ptree -e -o tree.md             # save emoji tree to a file
 ptree -c -e                     # emoji + colors together
+ptree -s                        # include hidden files
+ptree -s -e -c                  # all together
 ```
 
 When writing to a file, the tree is wrapped in a fenced code block so it renders nicely in Markdown.

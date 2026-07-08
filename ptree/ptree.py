@@ -28,10 +28,13 @@ class DirectoryTree:
         dir_only: bool = False,
         show_emojis: bool = False,
         use_color: bool = False,
+        show_hidden: bool = False,
         output=sys.stdout,
     ) -> None:
         self._output = output
-        self._generator = _TreeGenerator(root, dir_only, show_emojis, use_color)
+        self._generator = _TreeGenerator(
+            root, dir_only, show_emojis, show_hidden, use_color
+        )
 
     def generate(self):
         tree = self._generator.build()
@@ -53,11 +56,13 @@ class _TreeGenerator:
         root: pathlib.Path,
         dir_only: bool = False,
         show_emojis: bool = False,
+        show_hidden: bool = False,
         use_color: bool = False,
     ) -> None:
         self._root = root
         self._dir_only = dir_only
         self._show_emojis = show_emojis
+        self._show_hidden = show_hidden
         self._use_color = use_color
         self._tree = []
 
@@ -88,7 +93,9 @@ class _TreeGenerator:
 
         if self._dir_only:
             entries = [entry for entry in entries if entry.is_dir()]
-            return entries
+
+        if not self._show_hidden:
+            entries = [entry for entry in entries if not entry.name.startswith(".")]
 
         entries = sorted(entries, key=lambda entry: entry.is_file())
         return entries
