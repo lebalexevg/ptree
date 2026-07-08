@@ -16,9 +16,11 @@ OPEN_DIRECTORY_ICON = "📁"
 CLOSED_DIRECTORY_ICON = "📂"
 FILE_ICON = "📄"
 
+ROOT_COLOR_CODE = "\x1b[32m"
 DIRECTORY_COLOR_CODE = "\x1b[33m"
 FILE_COLOR_CODE = "\x1b[36m"
-RESET_COLOR_CODE = "\x1b[0m"
+BOLD_FONT_CODE = "\x1b[1m"
+RESET_CODE = "\x1b[0m"
 
 
 class DirectoryTree:
@@ -72,7 +74,9 @@ class _TreeGenerator:
         return self._tree
 
     def _tree_head(self) -> None:
-        self._tree.append(f"{self._root}{os.sep}")
+        self._tree.append(
+            f"{BOLD_FONT_CODE}{ROOT_COLOR_CODE}{self._root}{os.sep}{RESET_CODE}"
+        )
         self._tree.append(PIPE)
 
     def _tree_body(self, directory: pathlib.Path, prefix=""):
@@ -115,7 +119,7 @@ class _TreeGenerator:
             else ""
         )
 
-        body = f"{DIRECTORY_COLOR_CODE if self._use_color else ''}{emoji} {directory.name}{os.sep}{RESET_COLOR_CODE if self._use_color else ''}"
+        body = f"{BOLD_FONT_CODE}{DIRECTORY_COLOR_CODE if self._use_color else ''}{emoji} {directory.name}{os.sep}{RESET_CODE if self._use_color else ''}"
 
         self._tree.append(f"{prefix}{connector}{body}")
 
@@ -130,6 +134,6 @@ class _TreeGenerator:
 
     def _add_file(self, file: pathlib.Path, prefix: str, connector: str) -> None:
         emoji = f" {FILE_ICON}" if self._show_emojis else ""
-        body = f"{FILE_COLOR_CODE if self._use_color else ''}{emoji} {file.name}{RESET_COLOR_CODE if self._use_color else ''}"
+        body = f"{FILE_COLOR_CODE if self._use_color else ''}{emoji} {file.name}{RESET_CODE if self._use_color else ''}"
 
         self._tree.append(f"{prefix}{connector}{body}")
