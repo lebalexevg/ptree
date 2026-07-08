@@ -98,8 +98,6 @@ class _TreeGenerator:
             else ""
         )
 
-        print(self._dir_only)
-
         self._tree.append(f"{prefix}{connector}{emoji} {directory.name}{os.sep}")
 
         if index != entries_count - 1:
