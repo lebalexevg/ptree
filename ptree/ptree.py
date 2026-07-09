@@ -35,6 +35,7 @@ class DirectoryTree:
     def __init__(
         self,
         root: pathlib.Path,
+        max_depth: int | None = None,
         dir_only: bool = False,
         show_emojis: bool = False,
         use_color: bool = False,
@@ -44,7 +45,7 @@ class DirectoryTree:
     ) -> None:
         self._output = output
         self._generator = _TreeGenerator(
-            root, dir_only, show_emojis, show_hidden, use_color,
+            root, dir_only, show_emojis, show_hidden, use_color, max_depth
         )
         self._show_stats = show_stats
 
@@ -87,12 +88,15 @@ class _TreeGenerator:
         show_emojis: bool = False,
         show_hidden: bool = False,
         use_color: bool = False,
+        max_depth: int | None = None,
     ) -> None:
         self._root = root
         self._dir_only = dir_only
         self._show_emojis = show_emojis
         self._show_hidden = show_hidden
         self._use_color = use_color
+        self._max_depth = max_depth
+        self._current_depth = 0
         self._tree = []
         self._stats: Statistics = {"directories": 0, "files": 0, "total": 0}
 
@@ -111,6 +115,8 @@ class _TreeGenerator:
         self._tree.append(PIPE)
 
     def _tree_body(self, directory: pathlib.Path, prefix=""):
+        self._current_depth += 1
+
         entries = self._prepare_entries(directory)
         entries = sorted(entries, key=lambda entry: entry.is_file())
         entries_count = len(entries)
@@ -127,8 +133,13 @@ class _TreeGenerator:
 
             self._stats["total"] += 1
 
+        self._current_depth -= 1
+
     def _prepare_entries(self, directory: pathlib.Path) -> list[pathlib.Path]:
         entries = directory.iterdir()
+
+        if self._max_depth is not None and self._current_depth > self._max_depth:
+            return []
 
         if self._dir_only:
             entries = [entry for entry in entries if entry.is_dir()]

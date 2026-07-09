@@ -18,12 +18,13 @@ A simple directory tree viewer for your terminal.
 ## Usage
 
 ```
-ptree [ROOT] [-d] [-e] [-c] [-s] [--no-stats] [-o FILE]
+ptree [ROOT] [-n DEPTH] [-d] [-e] [-c] [-s] [--no-stats] [-o FILE]
 ```
 
 | Argument | Description |
 |---|---|
 | `ROOT` | Directory to visualize. Defaults to `.`. |
+| `-n`, `--max-depth DEPTH` | Limit traversal depth (e.g. `-n 1` shows only immediate children). |
 | `-d`, `--dir-only` | Show directories only, skip files. |
 | `-e`, `--emojis` | Decorate items with emoji icons. |
 | `-c`, `--color` | Highlight directories in yellow and files in cyan. |
@@ -43,6 +44,8 @@ ptree -e -o tree.md             # save emoji tree to a file
 ptree -c -e                     # emoji + colors together
 ptree -s                        # include hidden files
 ptree -s -e -c                  # all together
+ptree -n 1                      # show only the first level
+ptree -n 2                      # show up to two levels deep
 ptree --no-stats                # hide the summary statistics
 ```
 

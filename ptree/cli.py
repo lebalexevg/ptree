@@ -19,7 +19,7 @@ def main() -> None:
         sys.exit(1)
 
     tree = DirectoryTree(
-        root, args.dir_only, args.emojis, args.color, args.show_hidden, args.no_stats, args.output
+        root, args.max_depth, args.dir_only, args.emojis, args.color, args.show_hidden, args.no_stats, args.output
     )
     tree.generate()
 
@@ -39,6 +39,13 @@ def parse_cmd_line_arguments() -> argparse.Namespace:
         nargs="?",
         default=".",
         help="the root directory to start the tree from",
+    )
+    parser.add_argument(
+        "-n",
+        "--max-depth",
+        metavar="DEPTH",
+        type=int,
+        help="the maximum depth of the tree",
     )
     parser.add_argument(
         "-d",
