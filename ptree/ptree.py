@@ -55,7 +55,12 @@ class DirectoryTree:
             tree.insert(0, "```")
             tree.append("```")
 
-            self._output = open(self._output, mode="w", encoding="utf-8")
+            if isinstance(self._output, (str, pathlib.Path)):
+                self._output = open(self._output, mode="w", encoding="utf-8")
+            else:
+                raise TypeError(
+                    f"output must be a file path, got {type(self._output)} instead"
+                )
 
         stats = self._generator.get_stats()
 
