@@ -6,6 +6,8 @@ import os
 import pathlib
 import sys
 
+from typing import TypedDict
+
 PIPE = "|"
 ELBOW = "└──"
 TEE = "├──"
@@ -23,6 +25,12 @@ BOLD_FONT_CODE = "\x1b[1m"
 RESET_CODE = "\x1b[0m"
 
 
+class Statistics(TypedDict):
+    directories: int
+    files: int
+    total: int
+
+
 class DirectoryTree:
     def __init__(
         self,
@@ -31,12 +39,14 @@ class DirectoryTree:
         show_emojis: bool = False,
         use_color: bool = False,
         show_hidden: bool = False,
+        show_stats: bool = True,
         output=sys.stdout,
     ) -> None:
         self._output = output
         self._generator = _TreeGenerator(
-            root, dir_only, show_emojis, show_hidden, use_color
+            root, dir_only, show_emojis, show_hidden, use_color,
         )
+        self._show_stats = show_stats
 
     def generate(self):
         tree = self._generator.build()
@@ -47,9 +57,21 @@ class DirectoryTree:
 
             self._output = open(self._output, mode="w", encoding="utf-8")
 
+        stats = self._generator.get_stats()
+
         with self._output as stream:
             for entry in tree:
                 print(entry, file=stream)
+
+            if self._show_stats:
+                statistics = (
+                    "\n"
+                    f"{BOLD_FONT_CODE}Total:{RESET_CODE} {stats['total']} \n"
+                    f"{BOLD_FONT_CODE}Directories:{RESET_CODE} {stats['directories']} \n"
+                    f"{BOLD_FONT_CODE}Files:{RESET_CODE} {stats['files']}"
+                )
+
+                print(statistics, file=stream)
 
 
 class _TreeGenerator:
@@ -67,11 +89,15 @@ class _TreeGenerator:
         self._show_hidden = show_hidden
         self._use_color = use_color
         self._tree = []
+        self._stats: Statistics = {"directories": 0, "files": 0, "total": 0}
 
     def build(self) -> list[str]:
         self._tree_head()
         self._tree_body(self._root)
         return self._tree
+
+    def get_stats(self) -> Statistics:
+        return self._stats
 
     def _tree_head(self) -> None:
         self._tree.append(
@@ -88,9 +114,13 @@ class _TreeGenerator:
             connector = ELBOW if index == entries_count - 1 else TEE
 
             if entry.is_dir():
+                self._stats["directories"] += 1
                 self._add_directory(entry, index, entries_count, prefix, connector)
             else:
+                self._stats["files"] += 1
                 self._add_file(entry, prefix, connector)
+
+            self._stats["total"] += 1
 
     def _prepare_entries(self, directory: pathlib.Path) -> list[pathlib.Path]:
         entries = directory.iterdir()

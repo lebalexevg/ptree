@@ -19,7 +19,7 @@ def main() -> None:
         sys.exit(1)
 
     tree = DirectoryTree(
-        root, args.dir_only, args.emojis, args.color, args.show_hidden, args.output
+        root, args.dir_only, args.emojis, args.color, args.show_hidden, args.no_stats, args.output
     )
     tree.generate()
 
@@ -71,6 +71,11 @@ def parse_cmd_line_arguments() -> argparse.Namespace:
         "--color",
         action="store_true",
         help="use color in the tree",
+    )
+    parser.add_argument(
+        "--no-stats",
+        action="store_false",
+        help="do not show statistics at the bottom of the tree",
     )
 
     return parser.parse_args()
